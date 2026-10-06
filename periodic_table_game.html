@@ -1,0 +1,3164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Periodic Table Learning Game</title>
+
+<style>
+
+:root {
+    color-scheme: dark;
+
+    --bg: #0f172a;
+    --bg-elevated: #111827;
+    --panel-bg: #1e293b;
+    --border: #334155;
+    --border-strong: #475569;
+
+    --text: #ffffff;
+    --text-muted: #94a3b8;
+    --text-faint: #64748b;
+
+    --accent: #38bdf8;
+    --accent-hover: #0ea5e9;
+    --accent-contrast: #082f49;
+    --accent-active-bg: #172554;
+
+    --danger: #f87171;
+    --info: #60a5fa;
+    --warning: #fbbf24;
+    --success: #4ade80;
+
+    --success-text: #4ade80;
+    --error-text: #f87171;
+
+    --correct-text: #ffffff;
+    --correct-text-secondary: #f1f5f9;
+    --correct-glow: rgba(255, 255, 255, 0.18);
+
+    --wrong-bg: #450a0a;
+
+    --input-bg: #0f172a;
+    --input-text: #f8fafc;
+
+    --btn-secondary-bg: #334155;
+    --btn-secondary-hover: #475569;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    --bg: #eef2f6;
+    --bg-elevated: #ffffff;
+    --panel-bg: #ffffff;
+    --border: #cbd5e1;
+    --border-strong: #94a3b8;
+
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-faint: #64748b;
+
+    --accent: #0284c7;
+    --accent-hover: #0369a1;
+    --accent-contrast: #ffffff;
+    --accent-active-bg: #dbeafe;
+
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --warning: #d97706;
+    --success: #16a34a;
+
+    --success-text: #16a34a;
+    --error-text: #dc2626;
+
+    --correct-text: #0f172a;
+    --correct-text-secondary: #1e293b;
+    --correct-glow: rgba(15, 23, 42, 0.12);
+
+    --wrong-bg: #fee2e2;
+
+    --input-bg: #ffffff;
+    --input-text: #0f172a;
+
+    --btn-secondary-bg: #64748b;
+    --btn-secondary-hover: #475569;
+}
+
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, .score-box, .challenge, .target-card, .basket-panel, .table-panel,
+.basket-count, .basket-search input, .basket-element, .basket-symbol,
+.element-slot, .level1-drop-active, button {
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* HEADER */
+
+header {
+    position: relative;
+    text-align: center;
+    padding: 25px 15px;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.theme-toggle:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+@media(max-width:700px) {
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        top: 12px;
+        right: 12px;
+        font-size: 15px;
+    }
+}
+
+header h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+header p {
+    color: var(--text-muted);
+}
+
+
+/* MAIN CONTAINER */
+
+.container {
+    width: 95%;
+    max-width: 1500px;
+    margin: auto;
+    padding: 25px 0 50px;
+}
+
+
+/* SCORE */
+
+.score-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.score-box {
+    min-width: 130px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+}
+
+.score-box h2 {
+    color: var(--accent);
+    font-size: 26px;
+}
+
+.score-box p {
+    color: var(--text-muted);
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+
+/* CHALLENGE */
+
+.challenge {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.challenge h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.challenge > p {
+    color: var(--text-muted);
+}
+
+
+/* RANDOM ELEMENT CARD */
+
+.target-card {
+    width: 260px;
+    min-height: 190px;
+
+    margin: 25px auto;
+
+    background: var(--bg-elevated);
+    border: 2px solid var(--accent);
+
+    border-radius: 18px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.12);
+}
+
+.target-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.target-symbol {
+    font-size: 52px;
+    font-weight: bold;
+    color: var(--accent);
+    margin: 5px 0;
+}
+
+.target-number {
+    font-size: 18px;
+    color: var(--text-muted);
+}
+
+.target-label {
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-top: 8px;
+}
+
+
+/* MESSAGE */
+
+#message {
+    min-height: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.success {
+    color: var(--success-text);
+}
+
+.error {
+    color: var(--error-text);
+}
+
+
+/* =====================================================
+   LEVEL 1 BASKET LAYOUT
+===================================================== */
+
+.level1-layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+    margin-top: 10px;
+}
+
+.basket-panel,
+.table-panel {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    width: 100%;
+}
+
+.basket-panel {
+    height: 620px;  
+    display: flex;
+    flex-direction: column;
+}
+
+.basket-header,
+.table-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.basket-header h2,
+.table-panel-header h2 {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.basket-header p,
+.table-panel-header p {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.basket-count {
+    white-space: nowrap;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    padding: 7px 9px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.basket-search {
+    margin-bottom: 10px;
+    width: 100%;
+    min-width: 0;
+}
+
+.basket-search input {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--input-text);
+    font-size: 13px;
+    outline: none;
+}
+
+.basket-search input::placeholder {
+    color: var(--text-faint);
+}
+
+.basket-search input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.12);
+}
+
+.basket-no-results {
+    grid-column: 1 / -1;
+    padding: 14px 8px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.element-basket {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px 6px 4px 2px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    align-content: start;
+}
+
+.basket-element {
+    min-height: 58px;
+    min-width: 0;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 9px;
+    padding: 7px;
+    cursor: grab;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.basket-element:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+}
+
+.basket-element:active {
+    cursor: grabbing;
+}
+
+.basket-element.dragging {
+    opacity: 0.45;
+}
+
+.basket-symbol {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    border-radius: 7px;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--input-text);
+}
+
+.basket-name {
+    min-width: 0;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.table-panel {
+    min-width: 0;
+}
+
+.table-panel .table-wrapper {
+    margin: 0 -4px;
+}
+
+.level1-drop-active {
+    border-color: var(--accent) !important;
+    background: var(--accent-active-bg) !important;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.18);
+}
+
+.level1-layout {
+    display: none;
+}
+
+.level1-layout.standard-mode .basket-panel,
+.level1-layout.standard-mode .table-panel-header {
+    display: none;
+}
+
+.level1-layout.standard-mode .table-panel {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.level1-layout.standard-mode .table-panel .table-wrapper {
+    margin: 0;
+}
+
+/* PERIODIC TABLE */
+
+.table-wrapper {
+    overflow-x: auto;
+    padding: 10px 5px 20px;
+}
+
+.periodic-table {
+
+    min-width: 1100px;
+
+    display: grid;
+
+    grid-template-columns: repeat(18, 1fr);
+
+    grid-template-rows: repeat(9, 75px);
+
+    column-gap: 5px;
+    row-gap: 5px;
+}
+
+
+/* =========================
+   GAP BEFORE F-BLOCK
+========================= */
+
+/*
+   Row 8 = Lanthanides
+   Row 9 = Actinides
+
+   Move the f-block down
+   to create a visible gap.
+*/
+
+.periodic-table > .f-block {
+    position: relative;
+    top: 25px;
+}
+
+.element-slot {
+
+    border: 2px solid var(--border);
+
+    border-radius: 8px;
+
+    background: var(--bg-elevated);
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition: all 0.2s ease;
+
+    color: var(--text-faint);
+}
+
+.element-slot:hover {
+
+    transform: translateY(-2px);
+}
+
+.element-slot:active {
+
+    transform: scale(0.96);
+}
+
+
+/* =====================================================
+   SOFT BLOCK COLORS (s / p / d / f)
+   Empty slots stay neutral; slots that hold a real
+   element get a soft tint matching their block so you
+   can see which family (s, p, d, f) each spot belongs to
+   at a glance — even before it's solved.
+===================================================== */
+
+.element-slot.s-block {
+    background: rgba(248, 113, 113, 0.12);
+    border-color: rgba(248, 113, 113, 0.45);
+}
+
+.element-slot.p-block {
+    background: rgba(96, 165, 250, 0.12);
+    border-color: rgba(96, 165, 250, 0.45);
+}
+
+.element-slot.d-block {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.45);
+}
+
+.element-slot.f-block {
+    background: rgba(74, 222, 128, 0.12);
+    border-color: rgba(74, 222, 128, 0.45);
+}
+
+.element-slot.s-block:hover {
+    background: rgba(248, 113, 113, 0.22);
+    border-color: var(--danger);
+}
+
+.element-slot.p-block:hover {
+    background: rgba(96, 165, 250, 0.22);
+    border-color: var(--info);
+}
+
+.element-slot.d-block:hover {
+    background: rgba(251, 191, 36, 0.22);
+    border-color: var(--warning);
+}
+
+.element-slot.f-block:hover {
+    background: rgba(74, 222, 128, 0.22);
+    border-color: var(--success);
+}
+
+
+/* EMPTY */
+
+.empty {
+
+    visibility: hidden;
+
+    pointer-events: none;
+}
+
+
+/* CORRECT
+   Keeps the same block color family (so the solved cell
+   still tells you s/p/d/f), just more saturated + a subtle
+   inner glow to mark it as solved. */
+
+.correct {
+
+    color: var(--correct-text);
+
+    cursor: default;
+
+    box-shadow: 0 0 0 2px var(--correct-glow) inset;
+}
+
+.correct:hover {
+
+    transform: none;
+}
+
+.element-slot.correct.s-block {
+    background: rgba(248, 113, 113, 0.42) !important;
+    border-color: var(--danger) !important;
+}
+
+.element-slot.correct.p-block {
+    background: rgba(96, 165, 250, 0.42) !important;
+    border-color: var(--info) !important;
+}
+
+.element-slot.correct.d-block {
+    background: rgba(251, 191, 36, 0.42) !important;
+    border-color: rgba(255, 183, 0, 0.842) !important;
+}
+
+.element-slot.correct.f-block {
+    background: rgba(74, 222, 128, 0.42) !important;
+    border-color: var(--success) !important;
+}
+
+.correct-symbol {
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    color: var(--correct-text);
+}
+
+.correct-name {
+
+    font-size: 9px;
+
+    margin-top: 3px;
+
+    color: var(--correct-text-secondary);
+}
+
+
+/* WRONG */
+
+.wrong {
+
+    background: var(--wrong-bg) !important;
+
+    border-color: var(--danger) !important;
+}
+
+
+/* BLOCK LEGEND */
+
+.block-legend {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding: 0 5px 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.legend-s {
+    background: rgba(248, 113, 113, 0.42);
+    border: 1px solid var(--danger);
+}
+
+.legend-p {
+    background: rgba(96, 165, 250, 0.42);
+    border: 1px solid var(--info);
+}
+
+.legend-d {
+    background: rgba(251, 191, 36, 0.42);
+    border: 1px solid var(--warning);
+}
+
+.legend-f {
+    background: rgba(74, 222, 128, 0.42);
+    border: 1px solid var(--success);
+}
+
+
+/* BUTTONS */
+
+.buttons {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-top: 25px;
+
+    flex-wrap: wrap;
+}
+
+button {
+
+    border: none;
+
+    padding: 12px 22px;
+
+    border-radius: 9px;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.next-button {
+
+    background: var(--accent);
+
+    color: var(--accent-contrast);
+}
+
+.next-button:hover {
+
+    background: var(--accent-hover);
+}
+
+.reset-button {
+
+    background: var(--btn-secondary-bg);
+
+    color: white;
+}
+
+.reset-button:hover {
+
+    background: var(--btn-secondary-hover);
+}
+
+
+/* MOBILE */
+
+@media(max-width:700px) {
+
+    header h1 {
+        font-size: 24px;
+    }
+
+    .challenge {
+        padding: 18px;
+    }
+
+    .target-card {
+
+        width: 220px;
+
+        min-height: 175px;
+    }
+
+    .target-symbol {
+
+        font-size: 42px;
+    }
+
+    .periodic-table {
+
+        grid-template-rows: repeat(9, 65px);
+
+        min-width: 950px;
+    }
+
+    .level-button {
+        padding: 9px 14px;
+        font-size: 13px;
+    }
+
+    .level1-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .basket-panel {
+        height: 430px;
+    }
+
+    .element-basket {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media(max-width:1000px) and (min-width:701px) {
+    .level1-layout {
+        grid-template-columns: 270px minmax(0, 1fr);
+    }
+
+    .basket-panel {
+        height: 580px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<header>
+
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle light and dark theme" title="Toggle light / dark theme">🌙</button>
+
+    <h1>🧪 Periodic Table Learning Game</h1>
+
+    <p>Find the correct position of each element</p>
+
+</header>
+
+
+<div class="container">
+
+
+    <!-- SCORE -->
+
+    <div class="score-container">
+
+        <div class="score-box">
+
+            <h2 id="correctCount">0</h2>
+
+            <p>Correct</p>
+
+        </div>
+
+
+        <div class="score-box">
+
+            <h2 id="attemptCount">0</h2>
+
+            <p>Attempts</p>
+
+        </div>
+
+
+        <div class="score-box">
+
+            <h2 id="accuracy">0%</h2>
+
+            <p>Accuracy</p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- LEVEL SELECTOR -->
+
+    <div class="level-container">
+
+        <h2>🎮 Choose Level</h2>
+
+        <div class="level-buttons">
+
+            <button class="level-button active" data-level="1">
+                Level 1
+            </button>
+
+            <button class="level-button" data-level="2">
+                Level 2
+            </button>
+
+            <button class="level-button" data-level="3">
+                Level 3
+            </button>
+
+            <button class="level-button" data-level="4">
+                Level 4
+            </button>
+
+        </div>
+        <br>
+        <div id="levelDescription" class="level-description">
+            Level 1: Name + symbol + atomic number are shown.
+        </div>
+
+    </div>
+
+
+    <!-- CHALLENGE -->
+
+    <div class="challenge">
+
+        <h2 id="challengeTitle">🧠 Level 1 — Find This Element</h2>
+
+        <p id="challengeText">
+            Click the correct position in the periodic table.
+        </p>
+
+
+        <!-- RANDOM ELEMENT -->
+
+        <div class="target-card">
+
+            <div
+                class="target-name"
+                id="targetName">
+                Hydrogen
+            </div>
+
+
+            <div
+                class="target-symbol"
+                id="targetSymbol">
+                H
+            </div>
+
+
+            <div
+                class="target-number"
+                id="targetNumber">
+                Atomic Number: 1
+            </div>
+
+
+            <div class="target-label">
+                Where does it belong?
+            </div>
+
+        </div>
+
+
+        <div id="message"></div>
+
+        <button
+            class="hint-button"
+            id="hintButton"
+            style="display:none;">
+            💡 Hint
+        </button>
+
+        <div
+            id="hintBox"
+            class="hint-box">
+        </div>
+
+        <div
+            id="levelInfo"
+            class="level-info">
+        </div>
+
+    </div>
+
+
+    <!-- LEVEL 1 BASKET + BLANK PERIODIC TABLE -->
+
+    <div id="level1Workspace" class="level1-layout">
+
+        <div class="basket-panel">
+
+            <div class="basket-header">
+                <div>
+                    <h2>🧺 Element Basket</h2>
+                    <p>Drag an element to its correct position.</p>
+                </div>
+                <div id="basketCount" class="basket-count">118 elements</div>
+            </div>
+
+            <div class="basket-search">
+                <input
+                    type="search"
+                    id="basketSearch"
+                    placeholder="🔎 Search element name or symbol..."
+                    autocomplete="off"
+                    aria-label="Search element by name or symbol"
+                >
+            </div>
+
+            <div id="elementBasket" class="element-basket"></div>
+
+        </div>
+
+        <div class="table-panel">
+
+            <div class="table-panel-header">
+                <h2>🧪 Blank Periodic Table</h2>
+                <p>Drop the element into the correct position.</p>
+            </div>
+
+            <div class="table-wrapper">
+
+                <div
+                    id="periodicTable"
+                    class="periodic-table">
+                </div>
+
+            </div>
+            <br>
+            <div class="block-legend">
+                <div class="legend-item"><span class="legend-swatch legend-s"></span> s-block</div>
+                <div class="legend-item"><span class="legend-swatch legend-p"></span> p-block</div>
+                <div class="legend-item"><span class="legend-swatch legend-d"></span> d-block</div>
+                <div class="legend-item"><span class="legend-swatch legend-f"></span> f-block</div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- BUTTONS -->
+
+    <div class="buttons">
+
+        <button
+            class="next-button"
+            id="nextButton">
+
+            Next Element →
+
+        </button>
+
+
+        <button
+            class="reset-button"
+            id="resetButton">
+
+            🔄 Reset
+
+        </button>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================================
+   LIGHT / DARK THEME
+===================================================== */
+
+const themeToggle =
+    document.getElementById("themeToggle");
+
+const THEME_KEY = "pt-game-theme";
+
+function getStoredTheme() {
+
+    try {
+        return localStorage.getItem(THEME_KEY);
+    } catch (e) {
+        return null;
+    }
+
+}
+
+function storeTheme(theme) {
+
+    try {
+        localStorage.setItem(THEME_KEY, theme);
+    } catch (e) {
+        /* storage unavailable — theme just won't persist */
+    }
+
+}
+
+function applyTheme(theme) {
+
+    if (theme === "light") {
+
+        document.documentElement.setAttribute("data-theme", "light");
+        themeToggle.textContent = "☀️";
+        themeToggle.setAttribute("aria-label", "Switch to dark theme");
+
+    } else {
+
+        document.documentElement.removeAttribute("data-theme");
+        themeToggle.textContent = "🌙";
+        themeToggle.setAttribute("aria-label", "Switch to light theme");
+
+    }
+
+}
+
+function initTheme() {
+
+    let theme = getStoredTheme();
+
+    if (!theme) {
+
+        const prefersLight =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: light)").matches;
+
+        theme = prefersLight ? "light" : "dark";
+
+    }
+
+    applyTheme(theme);
+
+}
+
+themeToggle.addEventListener("click", function () {
+
+    const isLight =
+        document.documentElement.getAttribute("data-theme") === "light";
+
+    const nextTheme =
+        isLight ? "dark" : "light";
+
+    applyTheme(nextTheme);
+
+    storeTheme(nextTheme);
+
+});
+
+initTheme();
+
+
+/* =====================================================
+   ALL 118 ELEMENTS
+===================================================== */
+
+const elements = [
+
+    /* PERIOD 1 */
+
+    {
+        number: 1,
+        symbol: "H",
+        name: "Hydrogen",
+        group: 1,
+        period: 1
+    },
+
+    {
+        number: 2,
+        symbol: "He",
+        name: "Helium",
+        group: 18,
+        period: 1
+    },
+
+
+    /* PERIOD 2 */
+
+    {
+        number: 3,
+        symbol: "Li",
+        name: "Lithium",
+        group: 1,
+        period: 2
+    },
+
+    {
+        number: 4,
+        symbol: "Be",
+        name: "Beryllium",
+        group: 2,
+        period: 2
+    },
+
+    {
+        number: 5,
+        symbol: "B",
+        name: "Boron",
+        group: 13,
+        period: 2
+    },
+
+    {
+        number: 6,
+        symbol: "C",
+        name: "Carbon",
+        group: 14,
+        period: 2
+    },
+
+    {
+        number: 7,
+        symbol: "N",
+        name: "Nitrogen",
+        group: 15,
+        period: 2
+    },
+
+    {
+        number: 8,
+        symbol: "O",
+        name: "Oxygen",
+        group: 16,
+        period: 2
+    },
+
+    {
+        number: 9,
+        symbol: "F",
+        name: "Fluorine",
+        group: 17,
+        period: 2
+    },
+
+    {
+        number: 10,
+        symbol: "Ne",
+        name: "Neon",
+        group: 18,
+        period: 2
+    },
+
+
+    /* PERIOD 3 */
+
+    {
+        number: 11,
+        symbol: "Na",
+        name: "Sodium",
+        group: 1,
+        period: 3
+    },
+
+    {
+        number: 12,
+        symbol: "Mg",
+        name: "Magnesium",
+        group: 2,
+        period: 3
+    },
+
+    {
+        number: 13,
+        symbol: "Al",
+        name: "Aluminium",
+        group: 13,
+        period: 3
+    },
+
+    {
+        number: 14,
+        symbol: "Si",
+        name: "Silicon",
+        group: 14,
+        period: 3
+    },
+
+    {
+        number: 15,
+        symbol: "P",
+        name: "Phosphorus",
+        group: 15,
+        period: 3
+    },
+
+    {
+        number: 16,
+        symbol: "S",
+        name: "Sulfur",
+        group: 16,
+        period: 3
+    },
+
+    {
+        number: 17,
+        symbol: "Cl",
+        name: "Chlorine",
+        group: 17,
+        period: 3
+    },
+
+    {
+        number: 18,
+        symbol: "Ar",
+        name: "Argon",
+        group: 18,
+        period: 3
+    },
+
+
+    /* PERIOD 4 */
+
+    {
+        number: 19,
+        symbol: "K",
+        name: "Potassium",
+        group: 1,
+        period: 4
+    },
+
+    {
+        number: 20,
+        symbol: "Ca",
+        name: "Calcium",
+        group: 2,
+        period: 4
+    },
+
+    {
+        number: 21,
+        symbol: "Sc",
+        name: "Scandium",
+        group: 3,
+        period: 4
+    },
+
+    {
+        number: 22,
+        symbol: "Ti",
+        name: "Titanium",
+        group: 4,
+        period: 4
+    },
+
+    {
+        number: 23,
+        symbol: "V",
+        name: "Vanadium",
+        group: 5,
+        period: 4
+    },
+
+    {
+        number: 24,
+        symbol: "Cr",
+        name: "Chromium",
+        group: 6,
+        period: 4
+    },
+
+    {
+        number: 25,
+        symbol: "Mn",
+        name: "Manganese",
+        group: 7,
+        period: 4
+    },
+
+    {
+        number: 26,
+        symbol: "Fe",
+        name: "Iron",
+        group: 8,
+        period: 4
+    },
+
+    {
+        number: 27,
+        symbol: "Co",
+        name: "Cobalt",
+        group: 9,
+        period: 4
+    },
+
+    {
+        number: 28,
+        symbol: "Ni",
+        name: "Nickel",
+        group: 10,
+        period: 4
+    },
+
+    {
+        number: 29,
+        symbol: "Cu",
+        name: "Copper",
+        group: 11,
+        period: 4
+    },
+
+    {
+        number: 30,
+        symbol: "Zn",
+        name: "Zinc",
+        group: 12,
+        period: 4
+    },
+
+    {
+        number: 31,
+        symbol: "Ga",
+        name: "Gallium",
+        group: 13,
+        period: 4
+    },
+
+    {
+        number: 32,
+        symbol: "Ge",
+        name: "Germanium",
+        group: 14,
+        period: 4
+    },
+
+    {
+        number: 33,
+        symbol: "As",
+        name: "Arsenic",
+        group: 15,
+        period: 4
+    },
+
+    {
+        number: 34,
+        symbol: "Se",
+        name: "Selenium",
+        group: 16,
+        period: 4
+    },
+
+    {
+        number: 35,
+        symbol: "Br",
+        name: "Bromine",
+        group: 17,
+        period: 4
+    },
+
+    {
+        number: 36,
+        symbol: "Kr",
+        name: "Krypton",
+        group: 18,
+        period: 4
+    },
+
+
+    /* PERIOD 5 */
+
+    {
+        number: 37,
+        symbol: "Rb",
+        name: "Rubidium",
+        group: 1,
+        period: 5
+    },
+
+    {
+        number: 38,
+        symbol: "Sr",
+        name: "Strontium",
+        group: 2,
+        period: 5
+    },
+
+    {
+        number: 39,
+        symbol: "Y",
+        name: "Yttrium",
+        group: 3,
+        period: 5
+    },
+
+    {
+        number: 40,
+        symbol: "Zr",
+        name: "Zirconium",
+        group: 4,
+        period: 5
+    },
+
+    {
+        number: 41,
+        symbol: "Nb",
+        name: "Niobium",
+        group: 5,
+        period: 5
+    },
+
+    {
+        number: 42,
+        symbol: "Mo",
+        name: "Molybdenum",
+        group: 6,
+        period: 5
+    },
+
+    {
+        number: 43,
+        symbol: "Tc",
+        name: "Technetium",
+        group: 7,
+        period: 5
+    },
+
+    {
+        number: 44,
+        symbol: "Ru",
+        name: "Ruthenium",
+        group: 8,
+        period: 5
+    },
+
+    {
+        number: 45,
+        symbol: "Rh",
+        name: "Rhodium",
+        group: 9,
+        period: 5
+    },
+
+    {
+        number: 46,
+        symbol: "Pd",
+        name: "Palladium",
+        group: 10,
+        period: 5
+    },
+
+    {
+        number: 47,
+        symbol: "Ag",
+        name: "Silver",
+        group: 11,
+        period: 5
+    },
+
+    {
+        number: 48,
+        symbol: "Cd",
+        name: "Cadmium",
+        group: 12,
+        period: 5
+    },
+
+    {
+        number: 49,
+        symbol: "In",
+        name: "Indium",
+        group: 13,
+        period: 5
+    },
+
+    {
+        number: 50,
+        symbol: "Sn",
+        name: "Tin",
+        group: 14,
+        period: 5
+    },
+
+    {
+        number: 51,
+        symbol: "Sb",
+        name: "Antimony",
+        group: 15,
+        period: 5
+    },
+
+    {
+        number: 52,
+        symbol: "Te",
+        name: "Tellurium",
+        group: 16,
+        period: 5
+    },
+
+    {
+        number: 53,
+        symbol: "I",
+        name: "Iodine",
+        group: 17,
+        period: 5
+    },
+
+    {
+        number: 54,
+        symbol: "Xe",
+        name: "Xenon",
+        group: 18,
+        period: 5
+    },
+
+
+    /* PERIOD 6 */
+
+    {
+        number: 55,
+        symbol: "Cs",
+        name: "Cesium",
+        group: 1,
+        period: 6
+    },
+
+    {
+        number: 56,
+        symbol: "Ba",
+        name: "Barium",
+        group: 2,
+        period: 6
+    },
+
+    {
+        number: 57,
+        symbol: "La",
+        name: "Lanthanum",
+        group: 3,
+        period: 6
+    },
+
+    {
+        number: 58,
+        symbol: "Ce",
+        name: "Cerium",
+        group: 4,
+        period: 8
+    },
+
+    {
+        number: 59,
+        symbol: "Pr",
+        name: "Praseodymium",
+        group: 5,
+        period: 8
+    },
+
+    {
+        number: 60,
+        symbol: "Nd",
+        name: "Neodymium",
+        group: 6,
+        period: 8
+    },
+
+    {
+        number: 61,
+        symbol: "Pm",
+        name: "Promethium",
+        group: 7,
+        period: 8
+    },
+
+    {
+        number: 62,
+        symbol: "Sm",
+        name: "Samarium",
+        group: 8,
+        period: 8
+    },
+
+    {
+        number: 63,
+        symbol: "Eu",
+        name: "Europium",
+        group: 9,
+        period: 8
+    },
+
+    {
+        number: 64,
+        symbol: "Gd",
+        name: "Gadolinium",
+        group: 10,
+        period: 8
+    },
+
+    {
+        number: 65,
+        symbol: "Tb",
+        name: "Terbium",
+        group: 11,
+        period: 8
+    },
+
+    {
+        number: 66,
+        symbol: "Dy",
+        name: "Dysprosium",
+        group: 12,
+        period: 8
+    },
+
+    {
+        number: 67,
+        symbol: "Ho",
+        name: "Holmium",
+        group: 13,
+        period: 8
+    },
+
+    {
+        number: 68,
+        symbol: "Er",
+        name: "Erbium",
+        group: 14,
+        period: 8
+    },
+
+    {
+        number: 69,
+        symbol: "Tm",
+        name: "Thulium",
+        group: 15,
+        period: 8
+    },
+
+    {
+        number: 70,
+        symbol: "Yb",
+        name: "Ytterbium",
+        group: 16,
+        period: 8
+    },
+
+    {
+        number: 71,
+        symbol: "Lu",
+        name: "Lutetium",
+        group: 17,
+        period: 8
+    },
+
+    {
+        number: 72,
+        symbol: "Hf",
+        name: "Hafnium",
+        group: 4,
+        period: 6
+    },
+
+    {
+        number: 73,
+        symbol: "Ta",
+        name: "Tantalum",
+        group: 5,
+        period: 6
+    },
+
+    {
+        number: 74,
+        symbol: "W",
+        name: "Tungsten",
+        group: 6,
+        period: 6
+    },
+
+    {
+        number: 75,
+        symbol: "Re",
+        name: "Rhenium",
+        group: 7,
+        period: 6
+    },
+
+    {
+        number: 76,
+        symbol: "Os",
+        name: "Osmium",
+        group: 8,
+        period: 6
+    },
+
+    {
+        number: 77,
+        symbol: "Ir",
+        name: "Iridium",
+        group: 9,
+        period: 6
+    },
+
+    {
+        number: 78,
+        symbol: "Pt",
+        name: "Platinum",
+        group: 10,
+        period: 6
+    },
+
+    {
+        number: 79,
+        symbol: "Au",
+        name: "Gold",
+        group: 11,
+        period: 6
+    },
+
+    {
+        number: 80,
+        symbol: "Hg",
+        name: "Mercury",
+        group: 12,
+        period: 6
+    },
+
+    {
+        number: 81,
+        symbol: "Tl",
+        name: "Thallium",
+        group: 13,
+        period: 6
+    },
+
+    {
+        number: 82,
+        symbol: "Pb",
+        name: "Lead",
+        group: 14,
+        period: 6
+    },
+
+    {
+        number: 83,
+        symbol: "Bi",
+        name: "Bismuth",
+        group: 15,
+        period: 6
+    },
+
+    {
+        number: 84,
+        symbol: "Po",
+        name: "Polonium",
+        group: 16,
+        period: 6
+    },
+
+    {
+        number: 85,
+        symbol: "At",
+        name: "Astatine",
+        group: 17,
+        period: 6
+    },
+
+    {
+        number: 86,
+        symbol: "Rn",
+        name: "Radon",
+        group: 18,
+        period: 6
+    },
+
+
+    /* PERIOD 7 */
+
+    {
+        number: 87,
+        symbol: "Fr",
+        name: "Francium",
+        group: 1,
+        period: 7
+    },
+
+    {
+        number: 88,
+        symbol: "Ra",
+        name: "Radium",
+        group: 2,
+        period: 7
+    },
+
+    {
+        number: 89,
+        symbol: "Ac",
+        name: "Actinium",
+        group: 3,
+        period: 7
+    },
+
+    {
+        number: 90,
+        symbol: "Th",
+        name: "Thorium",
+        group: 4,
+        period: 9
+    },
+
+    {
+        number: 91,
+        symbol: "Pa",
+        name: "Protactinium",
+        group: 5,
+        period: 9
+    },
+
+    {
+        number: 92,
+        symbol: "U",
+        name: "Uranium",
+        group: 6,
+        period: 9
+    },
+
+    {
+        number: 93,
+        symbol: "Np",
+        name: "Neptunium",
+        group: 7,
+        period: 9
+    },
+
+    {
+        number: 94,
+        symbol: "Pu",
+        name: "Plutonium",
+        group: 8,
+        period: 9
+    },
+
+    {
+        number: 95,
+        symbol: "Am",
+        name: "Americium",
+        group: 9,
+        period: 9
+    },
+
+    {
+        number: 96,
+        symbol: "Cm",
+        name: "Curium",
+        group: 10,
+        period: 9
+    },
+
+    {
+        number: 97,
+        symbol: "Bk",
+        name: "Berkelium",
+        group: 11,
+        period: 9
+    },
+
+    {
+        number: 98,
+        symbol: "Cf",
+        name: "Californium",
+        group: 12,
+        period: 9
+    },
+
+    {
+        number: 99,
+        symbol: "Es",
+        name: "Einsteinium",
+        group: 13,
+        period: 9
+    },
+
+    {
+        number: 100,
+        symbol: "Fm",
+        name: "Fermium",
+        group: 14,
+        period: 9
+    },
+
+    {
+        number: 101,
+        symbol: "Md",
+        name: "Mendelevium",
+        group: 15,
+        period: 9
+    },
+
+    {
+        number: 102,
+        symbol: "No",
+        name: "Nobelium",
+        group: 16,
+        period: 9
+    },
+
+    {
+        number: 103,
+        symbol: "Lr",
+        name: "Lawrencium",
+        group: 17,
+        period: 9
+    },
+
+    {
+        number: 104,
+        symbol: "Rf",
+        name: "Rutherfordium",
+        group: 4,
+        period: 7
+    },
+
+    {
+        number: 105,
+        symbol: "Db",
+        name: "Dubnium",
+        group: 5,
+        period: 7
+    },
+
+    {
+        number: 106,
+        symbol: "Sg",
+        name: "Seaborgium",
+        group: 6,
+        period: 7
+    },
+
+    {
+        number: 107,
+        symbol: "Bh",
+        name: "Bohrium",
+        group: 7,
+        period: 7
+    },
+
+    {
+        number: 108,
+        symbol: "Hs",
+        name: "Hassium",
+        group: 8,
+        period: 7
+    },
+
+    {
+        number: 109,
+        symbol: "Mt",
+        name: "Meitnerium",
+        group: 9,
+        period: 7
+    },
+
+    {
+        number: 110,
+        symbol: "Ds",
+        name: "Darmstadtium",
+        group: 10,
+        period: 7
+    },
+
+    {
+        number: 111,
+        symbol: "Rg",
+        name: "Roentgenium",
+        group: 11,
+        period: 7
+    },
+
+    {
+        number: 112,
+        symbol: "Cn",
+        name: "Copernicium",
+        group: 12,
+        period: 7
+    },
+
+    {
+        number: 113,
+        symbol: "Nh",
+        name: "Nihonium",
+        group: 13,
+        period: 7
+    },
+
+    {
+        number: 114,
+        symbol: "Fl",
+        name: "Flerovium",
+        group: 14,
+        period: 7
+    },
+
+    {
+        number: 115,
+        symbol: "Mc",
+        name: "Moscovium",
+        group: 15,
+        period: 7
+    },
+
+    {
+        number: 116,
+        symbol: "Lv",
+        name: "Livermorium",
+        group: 16,
+        period: 7
+    },
+
+    {
+        number: 117,
+        symbol: "Ts",
+        name: "Tennessine",
+        group: 17,
+        period: 7
+    },
+
+    {
+        number: 118,
+        symbol: "Og",
+        name: "Oganesson",
+        group: 18,
+        period: 7
+    }
+
+];
+
+
+/* =====================================================
+   GAME VARIABLES
+===================================================== */
+
+let currentElement = null;
+
+let correct = 0;
+
+let attempts = 0;
+
+let solvedElements = new Set();
+
+let currentLevel = 1;
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const periodicTable =
+    document.getElementById("periodicTable");
+
+const targetName =
+    document.getElementById("targetName");
+
+const targetSymbol =
+    document.getElementById("targetSymbol");
+
+const targetNumber =
+    document.getElementById("targetNumber");
+
+const message =
+    document.getElementById("message");
+
+const correctCount =
+    document.getElementById("correctCount");
+
+const attemptCount =
+    document.getElementById("attemptCount");
+
+const accuracy =
+    document.getElementById("accuracy");
+
+const nextButton =
+    document.getElementById("nextButton");
+
+const resetButton =
+    document.getElementById("resetButton");
+
+const hintButton =
+    document.getElementById("hintButton");
+
+const hintBox =
+    document.getElementById("hintBox");
+
+const levelDescription =
+    document.getElementById("levelDescription");
+
+const challengeTitle =
+    document.getElementById("challengeTitle");
+
+const challengeText =
+    document.getElementById("challengeText");
+
+const levelInfo =
+    document.getElementById("levelInfo");
+
+const levelButtons =
+    document.querySelectorAll(".level-button");
+
+const level1Workspace =
+    document.getElementById("level1Workspace");
+
+const elementBasket =
+    document.getElementById("elementBasket");
+
+const basketCount =
+    document.getElementById("basketCount");
+
+const basketSearch =
+    document.getElementById("basketSearch");
+
+
+/* =====================================================
+   LEVEL INFORMATION
+===================================================== */
+
+const levelData = {
+
+    1: {
+        description:
+            "Level 1: Drag all 118 elements from the basket into the blank periodic table.",
+
+        title:
+            "🧠 Level 1 — Arrange All 118 Elements",
+
+        text:
+            "Drag each element from the basket to its correct position.",
+
+        info:
+            "The basket shows each element's name and symbol. Atomic number appears after a correct placement."
+    },
+
+    2: {
+        description:
+            "Level 2: Atomic number is hidden. Use the Hint button when you need help.",
+
+        title:
+            "🔥 Level 2 — No Atomic Number",
+
+        text:
+            "Find the element using its name and symbol.",
+
+        info:
+            "Hint reveals the atomic number of the current random element."
+    },
+
+    3: {
+        description:
+            "Level 3: The symbol is hidden. Use the atomic number and name.",
+
+        title:
+            "⚡ Level 3 — Symbol Challenge",
+
+        text:
+            "Find the element using its name and atomic number.",
+
+        info:
+            "Hint reveals the missing symbol."
+    },
+
+    4: {
+        description:
+            "Level 4: Only the element name is shown. Two hints are available.",
+
+        title:
+            "💀 Level 4 — Expert Mode",
+
+        text:
+            "Find the correct position using only the element name.",
+
+        info:
+            "Hint 1 reveals the symbol. Hint 2 reveals the atomic number."
+    }
+
+};
+
+
+/* =====================================================
+   CREATE PERIODIC TABLE
+===================================================== */
+
+function createPeriodicTable() {
+
+    periodicTable.innerHTML = "";
+
+    for (let period = 1; period <= 9; period++) {
+
+        for (let group = 1; group <= 18; group++) {
+
+            const slot =
+                document.createElement("div");
+
+            slot.classList.add("element-slot");
+
+            /* BLOCK COLORS / AREAS */
+
+            if (period === 8 || period === 9) {
+
+                slot.classList.add("f-block");
+
+            } else if (group === 1 || group === 2) {
+
+                slot.classList.add("s-block");
+
+            } else if (group >= 13 && group <= 18) {
+
+                slot.classList.add("p-block");
+
+            } else if (group >= 3 && group <= 12) {
+
+                slot.classList.add("d-block");
+
+            }
+
+            const element =
+                elements.find(
+                    item =>
+                    item.period === period &&
+                    item.group === group
+                );
+
+            /*
+               Level 1 is a BLANK table.
+               The element appears only after a correct drop.
+            */
+
+            if (!element) {
+
+                slot.classList.add("empty");
+
+            } else {
+
+                slot.dataset.number =
+                    element.number;
+
+                if (currentLevel === 1) {
+
+                    slot.classList.add("level1-drop-zone");
+
+                    slot.addEventListener("dragover", event => {
+                        event.preventDefault();
+                        slot.classList.add("level1-drop-active");
+                    });
+
+                    slot.addEventListener("dragleave", () => {
+                        slot.classList.remove("level1-drop-active");
+                    });
+
+                    slot.addEventListener("drop", event => {
+
+                        event.preventDefault();
+                        slot.classList.remove("level1-drop-active");
+
+                        const draggedNumber =
+                            Number(event.dataTransfer.getData("text/plain"));
+
+                        const draggedElement =
+                            elements.find(item => item.number === draggedNumber);
+
+                        if (draggedElement) {
+                            checkLevel1Drop(slot, element, draggedElement);
+                        }
+                    });
+
+                } else {
+
+                    slot.addEventListener(
+                        "click",
+                        function () {
+
+                            checkAnswer(
+                                slot,
+                                element
+                            );
+
+                        }
+                    );
+
+                }
+
+            }
+
+            periodicTable.appendChild(slot);
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   LEVEL 1 BASKET
+===================================================== */
+
+function createLevel1Basket() {
+
+    basketSearch.value = "";
+
+    elementBasket.innerHTML = "";
+
+    elements.forEach(element => {
+
+        const card =
+            document.createElement("div");
+
+        card.className = "basket-element";
+
+        card.draggable = true;
+
+        card.dataset.number = element.number;
+
+        card.innerHTML = `
+            <div class="basket-symbol">${element.symbol}</div>
+            <div class="basket-name">${element.name}</div>
+        `;
+
+        card.addEventListener("dragstart", event => {
+
+            event.dataTransfer.setData(
+                "text/plain",
+                String(element.number)
+            );
+
+            event.dataTransfer.effectAllowed = "move";
+
+            card.classList.add("dragging");
+
+        });
+
+        card.addEventListener("dragend", () => {
+            card.classList.remove("dragging");
+        });
+
+        elementBasket.appendChild(card);
+
+    });
+
+    updateBasketCount();
+
+}
+
+
+function filterBasket() {
+
+    const query =
+        basketSearch.value
+            .trim()
+            .toLowerCase();
+
+    const cards =
+        elementBasket.querySelectorAll(".basket-element");
+
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+
+        const elementNumber =
+            Number(card.dataset.number);
+
+        const element =
+            elements.find(
+                item => item.number === elementNumber
+            );
+
+        if (!element) {
+            return;
+        }
+
+        const matches =
+            element.name.toLowerCase().includes(query) ||
+            element.symbol.toLowerCase().includes(query);
+
+        card.style.display =
+            matches ? "" : "none";
+
+        if (matches) {
+            visibleCount++;
+        }
+
+    });
+
+    const oldMessage =
+        elementBasket.querySelector(".basket-no-results");
+
+    if (oldMessage) {
+        oldMessage.remove();
+    }
+
+    if (query && visibleCount === 0) {
+
+        const noResults =
+            document.createElement("div");
+
+        noResults.className =
+            "basket-no-results";
+
+        noResults.textContent =
+            "No element found. Try the element name or symbol.";
+
+        elementBasket.appendChild(noResults);
+    }
+
+}
+
+
+basketSearch.addEventListener(
+    "input",
+    filterBasket
+);
+
+
+function updateBasketCount() {
+
+    const remaining =
+        elements.length - solvedElements.size;
+
+    basketCount.textContent =
+        `${remaining} element${remaining === 1 ? "" : "s"} left`;
+
+}
+
+
+function checkLevel1Drop(
+    slot,
+    correctElement,
+    draggedElement
+) {
+
+    if (slot.classList.contains("correct")) {
+        return;
+    }
+
+    attempts++;
+
+    if (draggedElement.number === correctElement.number) {
+
+        correct++;
+
+        solvedElements.add(correctElement.number);
+
+        slot.classList.add("correct");
+
+        slot.classList.remove("level1-drop-zone");
+
+        slot.innerHTML = `
+            <div>
+                <div class="correct-symbol">
+                    ${correctElement.symbol}
+                </div>
+                <div class="correct-name" style="text-align:center;">
+                    ${correctElement.name}<br>
+                    ${correctElement.number}
+                </div>
+            </div>
+        `;
+
+        const basketCard =
+            elementBasket.querySelector(
+                `[data-number="${correctElement.number}"]`
+            );
+
+        if (basketCard) {
+            basketCard.remove();
+        }
+
+        message.textContent =
+            `✅ Correct! ${correctElement.name} — ${correctElement.symbol} — Atomic No. ${correctElement.number}`;
+
+        message.className = "success";
+
+        updateBasketCount();
+        updateScore();
+
+        if (solvedElements.size === elements.length) {
+
+            message.textContent =
+                "🎉 Amazing! You arranged all 118 elements correctly!";
+
+        }
+
+    } else {
+
+        slot.classList.add("wrong");
+
+        message.textContent =
+            `❌ Wrong position for ${draggedElement.name}. Try again!`;
+
+        message.className = "error";
+
+        setTimeout(() => {
+            slot.classList.remove("wrong");
+        }, 400);
+
+        updateScore();
+
+    }
+
+}
+
+/* =====================================================
+   SHOW CURRENT LEVEL
+===================================================== */
+
+function updateLevelUI() {
+
+    const data =
+        levelData[currentLevel];
+
+    const challenge =
+        document.querySelector(".challenge");
+
+    if (currentLevel === 1) {
+        challenge.style.display = "none";
+        level1Workspace.style.display = "grid";
+        level1Workspace.classList.add("level1-mode");
+        level1Workspace.classList.remove("standard-mode");
+        nextButton.style.display = "none";
+        createLevel1Basket();
+    } else {
+        challenge.style.display = "block";
+        level1Workspace.style.display = "block";
+        level1Workspace.classList.remove("level1-mode");
+        level1Workspace.classList.add("standard-mode");
+        nextButton.style.display = "inline-block";
+    }
+
+    levelDescription.textContent =
+        data.description;
+
+    challengeTitle.textContent =
+        data.title;
+
+    challengeText.textContent =
+        data.text;
+
+    levelInfo.textContent =
+        data.info;
+
+
+    levelButtons.forEach(button => {
+
+        button.classList.remove("active");
+
+        if (
+            Number(button.dataset.level) ===
+            currentLevel
+        ) {
+
+            button.classList.add("active");
+
+        }
+
+    });
+
+
+    if (currentLevel === 1) {
+
+        hintButton.style.display =
+            "none";
+
+    } else if (currentLevel === 2) {
+
+        hintButton.style.display =
+            "inline-block";
+
+        hintButton.textContent =
+            "💡 Show Atomic Number";
+
+    } else if (currentLevel === 3) {
+
+        hintButton.style.display =
+            "inline-block";
+
+        hintButton.textContent =
+            "💡 Show Symbol";
+
+    } else {
+
+        hintButton.style.display =
+            "inline-block";
+
+        hintButton.textContent =
+            "💡 Show Hint";
+
+    }
+
+}
+
+
+/* =====================================================
+   DISPLAY ELEMENT ACCORDING TO LEVEL
+===================================================== */
+
+function displayCurrentElement() {
+
+    if (!currentElement) {
+        return;
+    }
+
+    if (currentLevel === 1) {
+        return;
+    }
+
+    targetName.textContent =
+        currentElement.name;
+
+
+    /*
+       LEVEL 1
+       Name + Symbol + Atomic Number
+    */
+
+    if (currentLevel === 1) {
+
+        targetSymbol.textContent =
+            currentElement.symbol;
+
+        targetNumber.textContent =
+            "Atomic Number: " +
+            currentElement.number;
+
+    }
+
+
+    /*
+       LEVEL 2
+       Name + Symbol
+       Atomic number hidden
+    */
+
+    else if (currentLevel === 2) {
+
+        targetSymbol.textContent =
+            currentElement.symbol;
+
+        targetNumber.textContent =
+            "Atomic Number: ???";
+
+    }
+
+
+    /*
+       LEVEL 3
+       Name + Atomic Number
+       Symbol hidden
+    */
+
+    else if (currentLevel === 3) {
+
+        targetSymbol.textContent =
+            "?";
+
+        targetNumber.textContent =
+            "Atomic Number: " +
+            currentElement.number;
+
+    }
+
+
+    /*
+       LEVEL 4
+       Only Name
+    */
+
+    else {
+
+        targetSymbol.textContent =
+            "?";
+
+        targetNumber.textContent =
+            "Atomic Number: ???";
+
+    }
+
+
+    hintBox.textContent = "";
+
+}
+
+
+/* =====================================================
+   RANDOM ELEMENT
+===================================================== */
+
+function chooseRandomElement() {
+
+    /* Level 1 uses the 118-element basket instead of a random target. */
+
+    if (currentLevel === 1) {
+
+        currentElement = null;
+
+        message.textContent =
+            "Drag an element from the basket to its correct position.";
+
+        message.className = "";
+
+        createLevel1Basket();
+
+        return;
+    }
+
+    const availableElements =
+        elements.filter(
+            element =>
+            !solvedElements.has(element.number)
+        );
+
+    if (availableElements.length === 0) {
+
+        targetName.textContent =
+            "🎉 Completed!";
+
+        targetSymbol.textContent =
+            "118";
+
+        targetNumber.textContent =
+            "All elements completed";
+
+        message.textContent =
+            "Amazing! You completed all 118 elements!";
+
+        message.className =
+            "success";
+
+        hintBox.textContent = "";
+
+        hintButton.style.display =
+            "none";
+
+        return;
+    }
+
+    const randomIndex =
+        Math.floor(
+            Math.random() *
+            availableElements.length
+        );
+
+    currentElement =
+        availableElements[randomIndex];
+
+    displayCurrentElement();
+
+    message.textContent = "";
+    message.className = "";
+
+}
+
+/* =====================================================
+   HINT
+===================================================== */
+
+function showHint() {
+
+    if (currentLevel === 1 || !currentElement) {
+        return;
+    }
+
+
+    if (currentLevel === 2) {
+
+        hintBox.textContent =
+            "💡 Atomic Number: " +
+            currentElement.number;
+
+    }
+
+
+    else if (currentLevel === 3) {
+
+        hintBox.textContent =
+            "💡 Symbol: " +
+            currentElement.symbol;
+
+    }
+
+
+    else if (currentLevel === 4) {
+
+        if (!hintBox.dataset.firstHint) {
+
+            hintBox.textContent =
+                "💡 Symbol: " +
+                currentElement.symbol;
+
+            hintBox.dataset.firstHint =
+                "used";
+
+        } else {
+
+            hintBox.textContent =
+                "💡 Atomic Number: " +
+                currentElement.number;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   CHECK ANSWER
+===================================================== */
+
+function checkAnswer(
+    slot,
+    clickedElement
+) {
+
+    if (currentLevel === 1) {
+        return;
+    }
+
+    if (
+        slot.classList.contains("correct")
+    ) {
+
+        return;
+
+    }
+
+
+    attempts++;
+
+
+    if (
+        clickedElement.number ===
+        currentElement.number
+    ) {
+
+        correct++;
+
+
+        solvedElements.add(
+            currentElement.number
+        );
+
+
+        slot.classList.add("correct");
+
+
+        slot.innerHTML = `
+
+            <div>
+
+                <div class="correct-symbol">
+                    ${currentElement.symbol}
+                </div>
+
+                <div class="correct-name">
+                    ${currentElement.name}
+                </div>
+
+            </div>
+
+        `;
+
+
+        message.textContent =
+            `✅ Correct! ${currentElement.name}`;
+
+
+        message.className =
+            "success";
+
+
+        updateScore();
+
+    }
+
+
+    else {
+
+        slot.classList.add("wrong");
+
+
+        message.textContent =
+            "❌ Wrong position. Try again!";
+
+
+        message.className =
+            "error";
+
+
+        setTimeout(
+            () => {
+
+                slot.classList.remove("wrong");
+
+            },
+            400
+        );
+
+
+        updateScore();
+
+    }
+
+}
+
+
+/* =====================================================
+   SCORE
+===================================================== */
+
+function updateScore() {
+
+    correctCount.textContent =
+        correct;
+
+
+    attemptCount.textContent =
+        attempts;
+
+
+    let percentage = 0;
+
+
+    if (attempts > 0) {
+
+        percentage =
+            Math.round(
+                (correct / attempts) * 100
+            );
+
+    }
+
+
+    accuracy.textContent =
+        percentage + "%";
+
+}
+
+
+/* =====================================================
+   LEVEL BUTTONS
+===================================================== */
+
+levelButtons.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        function () {
+
+            currentLevel =
+                Number(
+                    this.dataset.level
+                );
+
+
+            /*
+               Changing level starts a fresh
+               challenge and score.
+            */
+
+            correct = 0;
+
+            attempts = 0;
+
+            solvedElements =
+                new Set();
+
+
+            hintBox.textContent = "";
+
+            delete hintBox.dataset.firstHint;
+
+            updateScore();
+
+            updateLevelUI();
+
+            createPeriodicTable();
+
+            chooseRandomElement();
+
+        }
+    );
+
+});
+
+
+/* =====================================================
+   HINT BUTTON
+===================================================== */
+
+hintButton.addEventListener(
+    "click",
+    function () {
+
+        showHint();
+
+    }
+);
+
+
+/* =====================================================
+   NEXT ELEMENT
+===================================================== */
+
+nextButton.addEventListener(
+    "click",
+    function () {
+
+        chooseRandomElement();
+
+    }
+);
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+resetButton.addEventListener(
+    "click",
+    function () {
+
+        correct = 0;
+
+        attempts = 0;
+
+        solvedElements =
+            new Set();
+
+        hintBox.textContent = "";
+
+        delete hintBox.dataset.firstHint;
+
+        updateScore();
+
+        updateLevelUI();
+
+        createPeriodicTable();
+
+        chooseRandomElement();
+
+    }
+);
+
+
+/* =====================================================
+   START GAME
+===================================================== */
+
+updateScore();
+
+updateLevelUI();
+
+createPeriodicTable();
+
+chooseRandomElement();
+
+
+</script>
+
+</body>
+</html>
